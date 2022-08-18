@@ -1,0 +1,13 @@
+{% include 'header.html'%}
+{% include 'navbar.html'%}
+
+<div class="container">
+    {% if car%}
+        {% include 'car.html'%}
+    {% else %}
+        <h2>Oops! We couldn't find a car with tha ID. Please try again! </h2>
+    {% endif %}
+</div>
+
+
+{% include 'footer.html'%}

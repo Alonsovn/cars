@@ -6,7 +6,7 @@ cars = {
         "price": 25000.0,
         "engine": "V8",
         "autonomous": False,
-        "sold": ["NA","EU"]
+        "sold": ["NA", "EU"]
     },
 
     2: {
@@ -16,7 +16,7 @@ cars = {
         "price": 55400.0,
         "engine": "V4",
         "autonomous": False,
-        "sold": ["AF","AN","AS","EU","NA","OC","SA"]
+        "sold": ["AF", "AN", "AS", "EU", "NA", "OC", "SA"]
     },
 
     3: {
@@ -46,6 +46,6 @@ cars = {
         "price": 215000.0,
         "engine": "V12",
         "autonomous": False,
-        "sold": ["NA","AF","OC","SA"]
+        "sold": ["NA", "AF", "OC", "SA"]
     }
 }

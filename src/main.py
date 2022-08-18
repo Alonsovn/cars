@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict
 
-from fastapi import FastAPI, Query, Path, HTTPException, status, Body, Request
+from fastapi import FastAPI, Query, Path, HTTPException, status, Body, Request, Form
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -34,14 +34,20 @@ def get_cars(request: Request, number: Optional[str] = Query("10", max_length=3)
                                        "cars": response, "title": "Home"})
 
 
-@app.get("/cars/{car_id}", response_model=CarSchema)
-def get_car_by_id(car_id: int = Path(..., ge=0, lt=1000)):
-    car = cars.get(car_id)
+@app.post("/search", response_class=RedirectResponse)
+def search_cars(id: str = Form(...)):
+    return RedirectResponse("/cars/" + id, status_code=302)
+
+
+@app.get("/cars/{id}", response_class=HTMLResponse)
+def get_car_by_id(request: Request, id: int = Path(..., ge=0, lt=1000)):
+    car = cars.get(id)
+    response = templates.TemplateResponse("search.html", {"request": request, "car": car, "title": "Search Car"})
 
     if not car:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Could not find car by Id")
+        response.status_code = status.HTTP_404_NOT_FOUND
 
-    return car
+    return response
 
 
 @app.post("/cars", status_code=status.HTTP_201_CREATED)
@@ -59,26 +65,26 @@ def add_cars(body_cars: List[CarSchema], min_id: Optional[int] = Body(0)):
     return "Ok"
 
 
-@app.put("/cars/{car_id}", response_model=Dict[str, CarSchema])
-def update_car(car_id: int, car: CarSchema = Body(...)):
-    stored = cars.get(car_id)
+@app.put("/cars/{id}", response_model=Dict[str, CarSchema])
+def update_car(id: int, car: CarSchema = Body(...)):
+    stored = cars.get(id)
     if not stored:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Could not find car with given id")
 
     stored = CarSchema(**stored)
     new = car.dict(exclude_unset=True)
     new = stored.copy(update=new)
-    cars[car_id] = jsonable_encoder(new)
-    response = {car_id: cars[car_id]}
+    cars[id] = jsonable_encoder(new)
+    response = {id: cars[id]}
 
     return response
 
 
-@app.delete("/cars/{car_id}")
-def delete_car(car_id: int):
-    if not cars.get(car_id):
+@app.delete("/cars/{id}")
+def delete_car(id: int):
+    if not cars.get(id):
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Could not find car with given id")
 
-    del cars[car_id]
+    del cars[id]
 
     return "OK"
