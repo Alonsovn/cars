@@ -50,8 +50,26 @@ def get_car_by_id(request: Request, id: int = Path(..., ge=0, lt=1000)):
     return response
 
 
+@app.get("/create", response_class=HTMLResponse)
+def create_car(request: Request):
+    return templates.TemplateResponse("create.html",
+                                      {"request": request, "title": "Create car"})
+
+
 @app.post("/cars", status_code=status.HTTP_201_CREATED)
-def add_cars(body_cars: List[CarSchema], min_id: Optional[int] = Body(0)):
+def add_cars(
+        make: Optional[str] = Form(...),
+        model: Optional[str] = Form(...),
+        year: Optional[str] = Form(...),
+        price: Optional[float] = Form(...),
+        engine: Optional[str] = Form(...),
+        autonomous: Optional[bool] = Form(...),
+        sold: Optional[List[str]] = Form(None),
+        min_id: Optional[int] = Body(0)):
+    body_cars = [CarSchema(make=make, model=model, year=year, price=price,
+                           engine=engine,
+                           autonomous=autonomous, sold=sold)]
+
     if len(body_cars) < 1:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="No cars to add")
 
@@ -62,7 +80,7 @@ def add_cars(body_cars: List[CarSchema], min_id: Optional[int] = Body(0)):
         cars[min_id] = car
         min_id += 1
 
-    return "Ok"
+    return RedirectResponse(url="/cars", status_code=302)
 
 
 @app.put("/cars/{id}", response_model=Dict[str, CarSchema])
