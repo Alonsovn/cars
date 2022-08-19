@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.responses import HTMLResponse
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+from starlette.status import HTTP_400_BAD_REQUEST
 
 from src.database import cars
 from src.schema.carSchema import CarSchema
@@ -122,11 +122,13 @@ def update_car(request: Request,
     return RedirectResponse(url="/cars", status_code=302)
 
 
-@app.delete("/cars/{id}")
-def delete_car(id: int):
+@app.get("/delete/{id}", response_class=RedirectResponse)
+def delete_car(request: Request, id: int = Path(...)):
     if not cars.get(id):
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Could not find car with given id")
+        return templates.TemplateResponse("search.html",
+                                          {"request": request, "id": id, "title": "Edit Car"},
+                                          status_code=status.HTTP_404_NOT_FOUND)
 
     del cars[id]
 
-    return "OK"
+    return RedirectResponse(url="/cars")
