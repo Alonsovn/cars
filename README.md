@@ -1,5 +1,5 @@
-# python-template
-Template app to create python projects
+# Cars
+Application to CRUD cars
 
 Install the virtualenv package  
 pip install virtualenv
